@@ -47,16 +47,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void InitData(){
-        data.add(new Goods("Enchated Forest",5.00,"作者","Johanna Basford",R.drawable.EnchatedForest));
-        data.add(new Goods("Arla Milk",59.00,"产地","德国",R.drawable.Arla));
-        data.add(new Goods("Devondale Milk",79.00,"产地","澳大利亚",R.drawable.Devondale));
+        data.add(new Goods("Enchated Forest",5.00,"作者","Johanna Basford",R.drawable.enchatedforest));
+        data.add(new Goods("Arla Milk",59.00,"产地","德国",R.drawable.arla));
+        data.add(new Goods("Devondale Milk",79.00,"产地","澳大利亚",R.drawable.devondale));
         data.add(new Goods("Kindle Oasis",2399.00,"容量","8GB",R.drawable.kindle));
         data.add(new Goods("waitrose 早餐麦片",179.00,"重量","2kg",R.drawable.waitrose));
-        data.add(new Goods("Mcvitie's 饼干",14.90,"产地","英国",R.drawable.Mcvitie));
-        data.add(new Goods("Ferrero Rocher",132.59,"重量","300g",R.drawable.Ferrero));
-        data.add(new Goods("Maltesers",141.43,"重量","118g",R.drawable.Maltesers));
-        data.add(new Goods("Lindt",139.42,"重量","249g",R.drawable.Lindt));
-        data.add(new Goods("Borggreve",28.90,"重量","640g",R.drawable.Borggreve));
+        data.add(new Goods("Mcvitie's 饼干",14.90,"产地","英国",R.drawable.mcvitie));
+        data.add(new Goods("Ferrero Rocher",132.59,"重量","300g",R.drawable.ferrero));
+        data.add(new Goods("Maltesers",141.43,"重量","118g",R.drawable.maltesers));
+        data.add(new Goods("Lindt",139.42,"重量","249g",R.drawable.lindt));
+        data.add(new Goods("Borggreve",28.90,"重量","640g",R.drawable.borggreve));
 
         {
             Map<String,Object> listitem = new LinkedHashMap<>();
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             listItems1.add(listitem);
         }//填充列表
         // - - - ListView - - - //
-        simpleAdapter = new SimpleAdapter(this,listItems2);
+        //simpleAdapter = new SimpleAdapter(this,listItems2);
         // - - - ListView - - - //
 
         // - - - RecyclerView - - - //

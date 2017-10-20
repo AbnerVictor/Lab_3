@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/Ferrero"
+            android:src="@drawable/ferrero"
             />
 
         <ImageView
@@ -88,7 +88,7 @@
                     android:textColor="@color/black"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/info1"
+                    app:layout_constraintBottom_toTopOf="@+id/info1"
                     app:layout_constraintVertical_chainStyle="packed"
                     android:text="￥132.39"
                     />
@@ -118,7 +118,7 @@
                     android:background="@drawable/divider"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/info_cart"
+                    app:layout_constraintRight_toLeftOf="@+id/info_cart"
                     android:layout_marginEnd="5dp"
                     />
                 <ImageView
