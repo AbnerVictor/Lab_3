@@ -1,5 +1,6 @@
 package com.example.abnervictor.lab_3;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -7,14 +8,20 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,6 +43,37 @@ public class MainActivity extends AppCompatActivity {
         findView();
         InitData();
         setListner();
+    }
+
+    @Override
+    protected void onActivityResult(int requestcode, int resultcode, Intent data){
+        if(requestcode == 1){
+            if (resultcode == 1){
+                Goods c = (Goods) data.getExtras().get("goods");
+                Map<String,Object> listitem = new LinkedHashMap<>();
+                assert c != null;
+                listitem.put("firstLetter",c.getFirst());
+                listitem.put("name",c.GetString(1));
+                listitem.put("price",c.GetString(2));
+                shoppinglist.add(c);
+                listItems2.add(listitem);
+
+                Map<String, Object> listitem2 = new LinkedHashMap<>();
+                Goods top = shoppinglist.get(0);
+                listitem2.put("firstLetter", "*");
+                listitem2.put("name", top.GetString(1));
+                listitem2.put("price", top.addPrice(c));
+                listItems2.remove(0);
+                listItems2.add(0,listitem2);
+                shoppinglist.remove(0);
+                shoppinglist.add(0,top);
+                simpleAdapter.notifyDataSetChanged();
+            }
+            Toast.makeText(getApplicationContext(),"返回购物车",Toast.LENGTH_SHORT).show();
+        }
+        else if(requestcode == 2){
+            Toast.makeText(getApplicationContext(),"返回商品清单",Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void findView(){
@@ -60,10 +98,12 @@ public class MainActivity extends AppCompatActivity {
 
         {
             Map<String,Object> listitem = new LinkedHashMap<>();
+            Goods c = new Goods("购物车",0,null,null,0);
             listitem.put("firstLetter","*");
-            listitem.put("name","购物车");
-            listitem.put("price","价格");
+            listitem.put("name",c.GetString(1));
+            listitem.put("price",c.GetString(2));
             listItems2.add(listitem);
+            shoppinglist.add(c);
         }//为购物车添加首行
 
         for (Goods c : data){
@@ -73,7 +113,8 @@ public class MainActivity extends AppCompatActivity {
             listItems1.add(listitem);
         }//填充列表
         // - - - ListView - - - //
-        //simpleAdapter = new SimpleAdapter(this,listItems2);
+        simpleAdapter = new SimpleAdapter(this,listItems2,R.layout.goods_list_item,new String[]{"firstLetter","name","price"},new int[] {R.id.first,R.id.name,R.id.price_});
+        shoppingList.setAdapter(simpleAdapter);
         // - - - ListView - - - //
 
         // - - - RecyclerView - - - //
@@ -97,19 +138,82 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("goods", data.get(position));
                 intent.putExtras(bundle);
-                startActivityForResult(intent,1);
-            }
+                startActivityForResult(intent,1);//requestCode == 1
+            }//跳转到商品详情界面
 
             @Override
             public void onLongClick(int position) {
                 commonAdapter.removeItem(position);
+               Toast.makeText(getApplicationContext(),"移除第"+position+"个商品",Toast.LENGTH_SHORT).show();
             }
         });
-
+        ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(commonAdapter);
+        animationAdapter.setDuration(1000); //设置动画
+        mRecyclerView.setAdapter(animationAdapter);
+        mRecyclerView.setItemAnimator(new OvershootInLeftAnimator());
+        builder.setTitle("移除商品");
         // - - - RecyclerView - - - //
     }
 
     private void setListner(){
+        fab.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                if(mRecyclerView.getVisibility()==View.VISIBLE){
+                    mRecyclerView.setVisibility(View.GONE);
+                    shoppingList.setVisibility(View.VISIBLE);
+                    fab.setImageResource(R.drawable.mainpage);
+                }
+                else{
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    shoppingList.setVisibility(View.GONE);
+                    fab.setImageResource(R.drawable.shoplist);
+                }
+            }
+        });//浮动按钮切换商品列表与购物车
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {}
+        });
+
+        shoppingList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i==0) return;//购物车标题栏不做响应
+                Intent intent = new Intent(MainActivity.this, GoodsInfo.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("goods",shoppinglist.get(i));
+                intent.putExtras(bundle);
+                startActivityForResult(intent,i);//requestCode == i
+            }
+        });//点击进入商品详情
+        shoppingList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int pos, long l) {
+                if (pos==0) return true;
+                builder.setMessage("从购物车移除"+shoppinglist.get(pos).GetString(1)+"?");//GetString(1)商品名
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        {
+                            Map<String, Object> listitem = new LinkedHashMap<>();
+                            Goods c = shoppinglist.get(0);
+                            listitem.put("firstLetter", "*");
+                            listitem.put("name", c.GetString(1));
+                            listitem.put("price", c.minusPrice(shoppinglist.get(pos)));
+                            listItems2.remove(0);
+                            listItems2.add(0,listitem);
+                            shoppinglist.remove(0);
+                            shoppinglist.add(0,c);
+                        }//计算总价
+                        listItems2.remove(pos);
+                        shoppinglist.remove(pos);
+                        simpleAdapter.notifyDataSetChanged();
+                    }
+                }).create().show();
+                return true;
+            }
+        });//长按移除
 
     }
 

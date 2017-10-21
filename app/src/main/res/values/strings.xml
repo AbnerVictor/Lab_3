@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Lab_3</string>
+    <string name="click_to_buy">一键下单</string>
+    <string name="share_contacts">分享商品</string>
+    <string name="no_interest">不感兴趣</string>
+    <string name="more_info">查看更多商品促销信息</string>
 </resources>

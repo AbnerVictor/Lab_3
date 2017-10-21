@@ -17,6 +17,7 @@
         android:gravity="center"
         android:textSize="20sp"
         android:text="A"
+        android:textColor="@color/white"
         android:background="@drawable/circle_background"
         android:layout_marginLeft="20dp"
         />
@@ -43,6 +44,7 @@
         android:layout_marginRight="20dp"
         android:textSize="20sp"
         android:text="$ 1.00"
+        android:textAlignment="center"
         android:textColor="@color/black"
         />
     </android.support.constraint.ConstraintLayout>

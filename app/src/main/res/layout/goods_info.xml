@@ -20,14 +20,15 @@
 
         <ImageView
             android:id="@+id/goods_pic"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:src="@drawable/ferrero"
             />
 
         <ImageView
+            android:id="@+id/back_button"
             android:src="@drawable/back"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -38,12 +39,14 @@
 
 
         <ImageView
+            android:id="@+id/star_button"
             android:src="@drawable/empty_star"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginBottom="10dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
+            android:tag="0"
             />
 
         <TextView
@@ -118,11 +121,11 @@
                     android:background="@drawable/divider"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintRight_toLeftOf="@+id/info_cart"
+                    app:layout_constraintRight_toLeftOf="@+id/add_to_cart"
                     android:layout_marginEnd="5dp"
                     />
                 <ImageView
-                    android:id="@+id/info_cart"
+                    android:id="@+id/add_to_cart"
                     android:src="@drawable/shoplist"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
@@ -152,52 +155,14 @@
                 />
         </LinearLayout>
 
-        <LinearLayout
+        <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@drawable/divider"
-            android:showDividers="middle|end"
-            android:orientation="vertical"
             android:layout_below="@+id/linearlayout2"
-            android:layout_marginTop="20dp"
-            >
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="10dp"
-                android:gravity="center_vertical|left"
-                android:text="一键下单"
-                android:background="@color/white"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="10dp"
-                android:gravity="center_vertical|left"
-                android:text="分享商品"
-                android:background="@color/white"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="10dp"
-                android:gravity="center_vertical|left"
-                android:text="不感兴趣"
-                android:background="@color/white"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:paddingLeft="10dp"
-                android:gravity="center_vertical|left"
-                android:text="查看更多商品促销信息"
-                android:background="@color/white"
-                android:textColor="@color/black"
-                />
-        </LinearLayout>
+            android:id="@+id/operationList"
+            android:layout_marginTop="20dp">
+
+        </ListView>
 
     </RelativeLayout>
 

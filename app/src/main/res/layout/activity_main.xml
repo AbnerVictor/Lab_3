@@ -11,22 +11,24 @@
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/goods_list"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        android:visibility="visible"
         >
 
     </android.support.v7.widget.RecyclerView>
 
     <ListView
         android:id="@+id/shopping_list"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone"
         >
     </ListView>
 
@@ -38,9 +40,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="20dp"
         android:layout_marginEnd="20dp"
-        android:backgroundTint="@color/white"
+        app:backgroundTint="@color/white"
         android:src="@drawable/shoplist"
-
         />
 
 </android.support.constraint.ConstraintLayout>

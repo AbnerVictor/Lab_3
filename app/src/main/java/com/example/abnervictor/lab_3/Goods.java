@@ -13,6 +13,7 @@ public class Goods implements Serializable{
     private String pricetag;
     private String info1;
     private String info2;
+    private boolean like;
     private int PicID;
 
     public Goods(String name,double price, String info1, String info2, int PicID){
@@ -21,6 +22,7 @@ public class Goods implements Serializable{
         this.info1 = info1;
         this.info2 = info2;
         this.PicID = PicID;
+        like = false;
         pricetag = "¥ "+ String.format("%.2f",price);
     }
 
@@ -36,6 +38,32 @@ public class Goods implements Serializable{
 
     public char getFirst(){
         return name.charAt(0);
+    }
+
+    public int getPicID(){ return PicID; }
+
+    public double getPrice(){
+        return price;
+    }
+
+    public String addPrice(Goods g){
+        this.price+=g.getPrice();
+        pricetag = "¥ "+ String.format("%.2f",price);
+        return pricetag;
+    }
+
+    public String minusPrice(Goods g){
+        this.price-=g.getPrice();
+        pricetag = "¥ "+ String.format("%.2f",price);
+        return pricetag;
+    }
+
+    public boolean getLike(){
+        return like;
+    }
+
+    public void reverseLike(){
+        like = !like;
     }
 
 }
