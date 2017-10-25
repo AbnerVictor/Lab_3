@@ -15,6 +15,7 @@ public class Goods implements Serializable{
     private String info2;
     private boolean like;
     private int PicID;
+    private int UID;//商品编号
 
     public Goods(String name,double price, String info1, String info2, int PicID){
         this.name = name;

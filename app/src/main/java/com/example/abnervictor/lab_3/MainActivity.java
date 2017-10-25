@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleAdapter simpleAdapter;
     private CommonAdapter<Map<String,Object>> commonAdapter;
     private FloatingActionButton fab;
-    private List<Goods> data = new ArrayList<>();
+    private List<Goods> Data = new ArrayList<>();
     private List<Goods> shoppinglist = new ArrayList<>();
     private List<Map<String,Object>> listItems1 = new ArrayList<>();
     private List<Map<String,Object>> listItems2 = new ArrayList<>();
@@ -47,32 +47,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestcode, int resultcode, Intent data){
-        if(requestcode == 1){
-            if (resultcode == 1){
-                Goods c = (Goods) data.getExtras().get("goods");
-                Map<String,Object> listitem = new LinkedHashMap<>();
-                assert c != null;
-                listitem.put("firstLetter",c.getFirst());
-                listitem.put("name",c.GetString(1));
-                listitem.put("price",c.GetString(2));
-                shoppinglist.add(c);
-                listItems2.add(listitem);
+        Toast.makeText(getApplicationContext(),"requestCode = "+Integer.toString(requestcode)+" and resultCode = "+Integer.toString(resultcode),Toast.LENGTH_SHORT).show();
 
-                Map<String, Object> listitem2 = new LinkedHashMap<>();
-                Goods top = shoppinglist.get(0);
-                listitem2.put("firstLetter", "*");
-                listitem2.put("name", top.GetString(1));
-                listitem2.put("price", top.addPrice(c));
-                listItems2.remove(0);
-                listItems2.add(0,listitem2);
-                shoppinglist.remove(0);
-                shoppinglist.add(0,top);
-                simpleAdapter.notifyDataSetChanged();
-            }
-            Toast.makeText(getApplicationContext(),"返回购物车",Toast.LENGTH_SHORT).show();
-        }
-        else if(requestcode == 2){
-            Toast.makeText(getApplicationContext(),"返回商品清单",Toast.LENGTH_SHORT).show();
+        if (resultcode == 2 || resultcode == 4){
+            Goods c = (Goods) data.getExtras().get("goods");
+            Map<String,Object> listitem = new LinkedHashMap<>();
+            assert c != null;
+            listitem.put("firstLetter",c.getFirst());
+            listitem.put("name",c.GetString(1));
+            listitem.put("price",c.GetString(2));
+            shoppinglist.add(c);
+            listItems2.add(listitem);
+
+            Map<String, Object> listitem2 = new LinkedHashMap<>();
+            Goods top = shoppinglist.get(0);
+            listitem2.put("firstLetter", "*");
+            listitem2.put("name", top.GetString(1));
+            listitem2.put("price", top.addPrice(c));
+            listItems2.remove(0);
+            listItems2.add(0,listitem2);
+            shoppinglist.remove(0);
+            shoppinglist.add(0,top);
+            simpleAdapter.notifyDataSetChanged();
         }
     }
 
@@ -85,16 +81,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void InitData(){
-        data.add(new Goods("Enchated Forest",5.00,"作者","Johanna Basford",R.drawable.enchatedforest));
-        data.add(new Goods("Arla Milk",59.00,"产地","德国",R.drawable.arla));
-        data.add(new Goods("Devondale Milk",79.00,"产地","澳大利亚",R.drawable.devondale));
-        data.add(new Goods("Kindle Oasis",2399.00,"容量","8GB",R.drawable.kindle));
-        data.add(new Goods("waitrose 早餐麦片",179.00,"重量","2kg",R.drawable.waitrose));
-        data.add(new Goods("Mcvitie's 饼干",14.90,"产地","英国",R.drawable.mcvitie));
-        data.add(new Goods("Ferrero Rocher",132.59,"重量","300g",R.drawable.ferrero));
-        data.add(new Goods("Maltesers",141.43,"重量","118g",R.drawable.maltesers));
-        data.add(new Goods("Lindt",139.42,"重量","249g",R.drawable.lindt));
-        data.add(new Goods("Borggreve",28.90,"重量","640g",R.drawable.borggreve));
+        Data.add(new Goods("Enchated Forest",5.00,"作者","Johanna Basford",R.drawable.enchatedforest));
+        Data.add(new Goods("Arla Milk",59.00,"产地","德国",R.drawable.arla));
+        Data.add(new Goods("Devondale Milk",79.00,"产地","澳大利亚",R.drawable.devondale));
+        Data.add(new Goods("Kindle Oasis",2399.00,"容量","8GB",R.drawable.kindle));
+        Data.add(new Goods("waitrose 早餐麦片",179.00,"重量","2kg",R.drawable.waitrose));
+        Data.add(new Goods("Mcvitie's 饼干",14.90,"产地","英国",R.drawable.mcvitie));
+        Data.add(new Goods("Ferrero Rocher",132.59,"重量","300g",R.drawable.ferrero));
+        Data.add(new Goods("Maltesers",141.43,"重量","118g",R.drawable.maltesers));
+        Data.add(new Goods("Lindt",139.42,"重量","249g",R.drawable.lindt));
+        Data.add(new Goods("Borggreve",28.90,"重量","640g",R.drawable.borggreve));
 
         {
             Map<String,Object> listitem = new LinkedHashMap<>();
@@ -106,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             shoppinglist.add(c);
         }//为购物车添加首行
 
-        for (Goods c : data){
+        for (Goods c : Data){
             Map<String,Object> listitem = new LinkedHashMap<>();
             listitem.put("name",c.GetString(1));
             listitem.put("firstLetter",c.getFirst());
@@ -136,9 +132,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(int position) {
                 Intent intent = new Intent(MainActivity.this,GoodsInfo.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("goods", data.get(position));
+                bundle.putSerializable("goods", Data.get(position));
                 intent.putExtras(bundle);
-                startActivityForResult(intent,1);//requestCode == 1
+                startActivityForResult(intent,position);//requestCode == position
             }//跳转到商品详情界面
 
             @Override
@@ -184,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("goods",shoppinglist.get(i));
                 intent.putExtras(bundle);
-                startActivityForResult(intent,i);//requestCode == i
+                startActivityForResult(intent,2);//requestCode == 2
             }
         });//点击进入商品详情
         shoppingList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {

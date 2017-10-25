@@ -27,6 +27,7 @@ public class GoodsInfo extends AppCompatActivity{
     private ListView operationList; //操作列表
     private Goods goods; //商品信息class
     private ImageView AddtoCart; //加入购物车
+    private int isAddtoCart; // 为1: 无操作, 为2: 加入购物车, 为3: 收藏商品, 为4: 收藏&加入购物车
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -45,6 +46,7 @@ public class GoodsInfo extends AppCompatActivity{
         info_2 = (TextView) findViewById(R.id.info2);
         operationList = (ListView) findViewById(R.id.operationList);
         AddtoCart = (ImageView) findViewById(R.id.add_to_cart);
+        isAddtoCart = 1;//1表示未加入购物车，2表示加入一件到购物车
     }
     private void initData(){
         Resources resources = getResources();
@@ -70,20 +72,24 @@ public class GoodsInfo extends AppCompatActivity{
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(2,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
+                setResult(isAddtoCart,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
                 finish();
             }
-        });//点击返回图标，结束本Activity, resultCode == 2
+        });//点击返回图标，结束本Activity, resultCode == 1
         star.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goods.reverseLike();
                 boolean like = goods.getLike();
                 if(like){
+                    if (isAddtoCart == 1) isAddtoCart = 3;
+                    else if (isAddtoCart == 2) isAddtoCart = 4;
                     Toast.makeText(getApplicationContext(),"已收藏商品",Toast.LENGTH_SHORT).show();
                     view.setBackgroundResource(R.drawable.full_star);
                 }
                 else{
+                    if (isAddtoCart == 3) isAddtoCart = 1;
+                    else if (isAddtoCart == 4) isAddtoCart = 2;
                     Toast.makeText(getApplicationContext(),"已取消收藏商品",Toast.LENGTH_SHORT).show();
                     view.setBackgroundResource(R.drawable.empty_star);
                 }
@@ -93,9 +99,11 @@ public class GoodsInfo extends AppCompatActivity{
         AddtoCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(1,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
+                if(isAddtoCart == 1) isAddtoCart = 2;
+                else if (isAddtoCart == 3) isAddtoCart = 4;
+                setResult(2,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
                 Toast.makeText(getApplicationContext(),"商品已添加到购物车",Toast.LENGTH_SHORT).show();
             }
-        });//添加到购物车, resultCode == 1
+        });//添加到购物车, resultCode == 2
     }
 }
