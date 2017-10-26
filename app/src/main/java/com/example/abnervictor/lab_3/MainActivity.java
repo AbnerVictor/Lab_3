@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
@@ -47,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestcode, int resultcode, Intent data){
-        Toast.makeText(getApplicationContext(),"requestCode = "+Integer.toString(requestcode)+" and resultCode = "+Integer.toString(resultcode),Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),"requestCode = "+Integer.toString(requestcode)+" and resultCode = "+Integer.toString(resultcode),Toast.LENGTH_SHORT).show();
 
         if (resultcode == 2 || resultcode == 4){
             Goods c = (Goods) data.getExtras().get("goods");
@@ -80,36 +81,36 @@ public class MainActivity extends AppCompatActivity {
         fab = (FloatingActionButton) findViewById(R.id.floating_button);
     }
 
-    private void InitData(){
-        Data.add(new Goods("Enchated Forest",5.00,"作者","Johanna Basford",R.drawable.enchatedforest));
-        Data.add(new Goods("Arla Milk",59.00,"产地","德国",R.drawable.arla));
-        Data.add(new Goods("Devondale Milk",79.00,"产地","澳大利亚",R.drawable.devondale));
-        Data.add(new Goods("Kindle Oasis",2399.00,"容量","8GB",R.drawable.kindle));
-        Data.add(new Goods("waitrose 早餐麦片",179.00,"重量","2kg",R.drawable.waitrose));
-        Data.add(new Goods("Mcvitie's 饼干",14.90,"产地","英国",R.drawable.mcvitie));
-        Data.add(new Goods("Ferrero Rocher",132.59,"重量","300g",R.drawable.ferrero));
-        Data.add(new Goods("Maltesers",141.43,"重量","118g",R.drawable.maltesers));
-        Data.add(new Goods("Lindt",139.42,"重量","249g",R.drawable.lindt));
-        Data.add(new Goods("Borggreve",28.90,"重量","640g",R.drawable.borggreve));
+    private void InitData() {
+        Data.add(new Goods("Enchated Forest", 5.00, "作者", "Johanna Basford", R.drawable.enchatedforest));
+        Data.add(new Goods("Arla Milk", 59.00, "产地", "德国", R.drawable.arla));
+        Data.add(new Goods("Devondale Milk", 79.00, "产地", "澳大利亚", R.drawable.devondale));
+        Data.add(new Goods("Kindle Oasis", 2399.00, "容量", "8GB", R.drawable.kindle));
+        Data.add(new Goods("waitrose 早餐麦片", 179.00, "重量", "2kg", R.drawable.waitrose));
+        Data.add(new Goods("Mcvitie's 饼干", 14.90, "产地", "英国", R.drawable.mcvitie));
+        Data.add(new Goods("Ferrero Rocher", 132.59, "重量", "300g", R.drawable.ferrero));
+        Data.add(new Goods("Maltesers", 141.43, "重量", "118g", R.drawable.maltesers));
+        Data.add(new Goods("Lindt", 139.42, "重量", "249g", R.drawable.lindt));
+        Data.add(new Goods("Borggreve", 28.90, "重量", "640g", R.drawable.borggreve));
 
         {
-            Map<String,Object> listitem = new LinkedHashMap<>();
-            Goods c = new Goods("购物车",0,null,null,0);
-            listitem.put("firstLetter","*");
-            listitem.put("name",c.GetString(1));
-            listitem.put("price",c.GetString(2));
+            Map<String, Object> listitem = new LinkedHashMap<>();
+            Goods c = new Goods("购物车", 0, null, null, 0);
+            listitem.put("firstLetter", "*");
+            listitem.put("name", c.GetString(1));
+            listitem.put("price", c.GetString(2));
             listItems2.add(listitem);
             shoppinglist.add(c);
         }//为购物车添加首行
 
-        for (Goods c : Data){
-            Map<String,Object> listitem = new LinkedHashMap<>();
-            listitem.put("name",c.GetString(1));
-            listitem.put("firstLetter",c.getFirst());
+        for (Goods c : Data) {
+            Map<String, Object> listitem = new LinkedHashMap<>();
+            listitem.put("name", c.GetString(1));
+            listitem.put("firstLetter", c.getFirst());
             listItems1.add(listitem);
         }//填充列表
         // - - - ListView - - - //
-        simpleAdapter = new SimpleAdapter(this,listItems2,R.layout.goods_list_item,new String[]{"firstLetter","name","price"},new int[] {R.id.first,R.id.name,R.id.price_});
+        simpleAdapter = new SimpleAdapter(this, listItems2, R.layout.goods_list_item, new String[]{"firstLetter", "name", "price"}, new int[]{R.id.first, R.id.name, R.id.price_});
         shoppingList.setAdapter(simpleAdapter);
         // - - - ListView - - - //
 
@@ -130,17 +131,18 @@ public class MainActivity extends AppCompatActivity {
         commonAdapter.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-                Intent intent = new Intent(MainActivity.this,GoodsInfo.class);
+                Intent intent = new Intent(MainActivity.this, GoodsInfo.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("goods", Data.get(position));
                 intent.putExtras(bundle);
-                startActivityForResult(intent,position);//requestCode == position
+                startActivityForResult(intent, position);//requestCode == position
             }//跳转到商品详情界面
 
             @Override
             public void onLongClick(int position) {
+                Data.remove(position);
                 commonAdapter.removeItem(position);
-               Toast.makeText(getApplicationContext(),"移除第"+position+"个商品",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "移除第" + (position+1) + "个商品", Toast.LENGTH_SHORT).show();
             }
         });
         ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(commonAdapter);
@@ -149,8 +151,19 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setItemAnimator(new OvershootInLeftAnimator());
         builder.setTitle("移除商品");
         // - - - RecyclerView - - - //
-    }
 
+        // - - - 发送热卖信息 - - - //
+        {
+            Random random = new Random();
+            int randomnum = random.nextInt(10); //产生一个0～(n-1)的随机数
+            Intent intentBroadcast = new Intent("MyApp_Launched");
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("goods", Data.get(randomnum));
+            intentBroadcast.putExtras(bundle);
+            sendBroadcast(intentBroadcast);
+        }
+        // - - - end of 发送热卖信息 - - - //
+    }
     private void setListner(){
         fab.setOnClickListener(new View.OnClickListener(){
             @Override
