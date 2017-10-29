@@ -15,6 +15,10 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,14 +48,23 @@ public class MainActivity extends AppCompatActivity {
         findView();
         InitData();
         setListner();
+        Brocast();
+
+        EventBus.getDefault().register(this);//
     }
 
     @Override
-    protected void onActivityResult(int requestcode, int resultcode, Intent data){
-        //Toast.makeText(getApplicationContext(),"requestCode = "+Integer.toString(requestcode)+" and resultCode = "+Integer.toString(resultcode),Toast.LENGTH_SHORT).show();
+    public void onDestroy() {
+        super.onDestroy();
+        //EventBus.getDefault().unregister(this);
+    }
 
-        if (resultcode == 2 || resultcode == 4){
-            Goods c = (Goods) data.getExtras().get("goods");
+    // This method will be called when a MessageEvent is posted
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event){
+
+        if(event.getGoods() != null){
+            Goods c = event.getGoods();
             Map<String,Object> listitem = new LinkedHashMap<>();
             assert c != null;
             listitem.put("firstLetter",c.getFirst());
@@ -70,7 +83,21 @@ public class MainActivity extends AppCompatActivity {
             shoppinglist.remove(0);
             shoppinglist.add(0,top);
             simpleAdapter.notifyDataSetChanged();
-        }
+        }//向购物车内添加商品
+
+        if (event.JumptoCart()){
+            if(mRecyclerView.getVisibility()==View.VISIBLE){
+                mRecyclerView.setVisibility(View.GONE);
+                shoppingList.setVisibility(View.VISIBLE);
+                fab.setImageResource(R.drawable.mainpage);
+            }
+        }//跳转到购物车
+
+    }//接受通过EventBus传来的信息
+
+    @Override
+    protected void onActivityResult(int requestcode, int resultcode, Intent data){
+        //Toast.makeText(getApplicationContext(),"requestCode = "+Integer.toString(requestcode)+" and resultCode = "+Integer.toString(resultcode),Toast.LENGTH_SHORT).show();
     }
 
     private void findView(){
@@ -132,10 +159,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(int position) {
                 Intent intent = new Intent(MainActivity.this, GoodsInfo.class);
+
+                MessageEvent message = new MessageEvent(false,null);
+                message.RefreshGoodsInfo(); //清理未终结的GoodsInfo
+                EventBus.getDefault().post(message);
+
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("goods", Data.get(position));
                 intent.putExtras(bundle);
-                startActivityForResult(intent, position);//requestCode == position
+                startActivity(intent);//requestCode == position
             }//跳转到商品详情界面
 
             @Override
@@ -152,17 +184,6 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("移除商品");
         // - - - RecyclerView - - - //
 
-        // - - - 发送热卖信息 - - - //
-        {
-            Random random = new Random();
-            int randomnum = random.nextInt(10); //产生一个0～(n-1)的随机数
-            Intent intentBroadcast = new Intent("MyApp_Launched");
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("goods", Data.get(randomnum));
-            intentBroadcast.putExtras(bundle);
-            sendBroadcast(intentBroadcast);
-        }
-        // - - - end of 发送热卖信息 - - - //
     }
     private void setListner(){
         fab.setOnClickListener(new View.OnClickListener(){
@@ -190,10 +211,15 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(i==0) return;//购物车标题栏不做响应
                 Intent intent = new Intent(MainActivity.this, GoodsInfo.class);
+
+                MessageEvent message = new MessageEvent(false,null);
+                message.RefreshGoodsInfo(); //清理未终结的GoodsInfo
+                EventBus.getDefault().post(message);
+
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("goods",shoppinglist.get(i));
+                bundle.putSerializable("goods", shoppinglist.get(i));
                 intent.putExtras(bundle);
-                startActivityForResult(intent,2);//requestCode == 2
+                startActivity(intent);//
             }
         });//点击进入商品详情
         shoppingList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -224,6 +250,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });//长按移除
 
+    }
+
+    private void Brocast(){
+        // - - - 发送热卖信息 - - - //
+        Random random = new Random();
+        int randomnum = random.nextInt(10); //产生一个0～(n-1)的随机数
+        Intent intentBroadcast = new Intent("MyApp_Launched");
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("goods", Data.get(randomnum));
+        intentBroadcast.putExtras(bundle);
+        sendBroadcast(intentBroadcast);
+        // - - - end of 发送热卖信息 - - - //
     }
 
 

@@ -20,9 +20,9 @@
         </activity>
 
 
-        <receiver android:name=".StaticReceiver">
+        <receiver android:name=".Receiver">
             <intent-filter>
-                <action android:name="App_Launched"/>
+                <action android:name="MyApp_Launched"/>
             </intent-filter>
         </receiver>
 

@@ -13,6 +13,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 /**
  * Created by abnervictor on 2017/10/20.
  */
@@ -28,9 +32,8 @@ public class GoodsInfo extends AppCompatActivity{
     private ListView operationList; //操作列表
     private Goods goods; //商品信息class
     private ImageView AddtoCart; //加入购物车
-    private int isAddtoCart; // 为1: 无操作, 为2: 加入购物车, 为3: 收藏商品, 为4: 收藏&加入购物车
     private IntentFilter dynamic_filter;
-    private DynamicReceiver dynamicReceiver;
+    private  Receiver dynamicReceiver;
     private int Add_Cart;
 
 
@@ -40,7 +43,24 @@ public class GoodsInfo extends AppCompatActivity{
         findView();
         initData();
         setListener();
+
+        EventBus.getDefault().register(this);//
     }
+
+    @Override
+    protected  void onDestroy(){
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);//
+    }
+
+    // This method will be called when a MessageEvent is posted
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent event){
+        if(event.getRefresh_GoodsInfo()){
+            finish();
+        }
+    }//收到要刷新商品页面的信息，终止原来的商品页面内容，以重新创建
+
     private void findView(){
         setContentView(R.layout.goods_info);
         goodsPic = (ImageView) findViewById(R.id.goods_pic);
@@ -52,7 +72,6 @@ public class GoodsInfo extends AppCompatActivity{
         info_2 = (TextView) findViewById(R.id.info2);
         operationList = (ListView) findViewById(R.id.operationList);
         AddtoCart = (ImageView) findViewById(R.id.add_to_cart);
-        isAddtoCart = 1;//1表示未加入购物车，2表示加入一件到购物车
         Add_Cart = 0;
     }
     private void initData(){
@@ -77,10 +96,10 @@ public class GoodsInfo extends AppCompatActivity{
 
         // - - - - - - - - 动态注册广播 - - - - - - - -
 
-            dynamic_filter = new IntentFilter();
-            dynamic_filter.addAction("Goods_AddtoCart");//添加动态广播的Action
-            dynamicReceiver = new DynamicReceiver();
-            registerReceiver(dynamicReceiver,dynamic_filter);
+        dynamic_filter = new IntentFilter();
+        dynamic_filter.addAction("Goods_AddtoCart");//添加动态广播的Action
+        dynamicReceiver = new Receiver();
+        registerReceiver(dynamicReceiver,dynamic_filter);
 
         // - - - - - - - - 注册完毕 - - - - - - - -
     }
@@ -88,11 +107,10 @@ public class GoodsInfo extends AppCompatActivity{
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setResult(isAddtoCart,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
-                finish();
-
+                Intent intent = new Intent(GoodsInfo.this,MainActivity.class);
+                startActivity(intent);
                 unregisterReceiver(dynamicReceiver);//退出界面后注销广播dynamicReceiver
-
+                finish();
             }
         });//点击返回图标，结束本Activity, resultCode == 1
         star.setOnClickListener(new View.OnClickListener() {
@@ -101,14 +119,10 @@ public class GoodsInfo extends AppCompatActivity{
                 goods.reverseLike();
                 boolean like = goods.getLike();
                 if(like){
-                    if (isAddtoCart == 1) isAddtoCart = 3;
-                    else if (isAddtoCart == 2) isAddtoCart = 4;
                     Toast.makeText(getApplicationContext(),"已收藏商品",Toast.LENGTH_SHORT).show();
                     view.setBackgroundResource(R.drawable.full_star);
                 }
                 else{
-                    if (isAddtoCart == 3) isAddtoCart = 1;
-                    else if (isAddtoCart == 4) isAddtoCart = 2;
                     Toast.makeText(getApplicationContext(),"已取消收藏商品",Toast.LENGTH_SHORT).show();
                     view.setBackgroundResource(R.drawable.empty_star);
                 }
@@ -118,23 +132,21 @@ public class GoodsInfo extends AppCompatActivity{
         AddtoCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isAddtoCart == 1) isAddtoCart = 2;
-                else if (isAddtoCart == 3) isAddtoCart = 4;
-                setResult(2,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
+                //setResult(2,new Intent(GoodsInfo.this,MainActivity.class).putExtra("goods",goods));
                 Toast.makeText(getApplicationContext(),"商品已添加到购物车",Toast.LENGTH_SHORT).show();
-
-
-                {
-                    Intent intentBroadcast = new Intent("Goods_AddtoCart");
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("goods", goods);
-                    bundle.putInt("Num",Add_Cart);
-                    intentBroadcast.putExtras(bundle);
-                    sendBroadcast(intentBroadcast);
-                }//发送添加到购物车的广播
-
+                EventBus.getDefault().post(new MessageEvent(false,goods));
+                Brocast();
                 Add_Cart += 1; //计算点击的次数
             }
         });//添加到购物车, resultCode == 2
+    }
+
+    private void Brocast(){
+        Intent intentBroadcast = new Intent("Goods_AddtoCart");
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("goods", goods);
+        bundle.putInt("Num",Add_Cart);
+        intentBroadcast.putExtras(bundle);
+        sendBroadcast(intentBroadcast);
     }
 }
