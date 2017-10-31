@@ -50,7 +50,8 @@ public class GoodsInfo extends AppCompatActivity{
     @Override
     protected  void onDestroy(){
         super.onDestroy();
-        EventBus.getDefault().unregister(this);//
+        EventBus.getDefault().unregister(this);//注销订阅Eventbus
+        unregisterReceiver(dynamicReceiver);//退出界面后注销广播dynamicReceiver
     }
 
     // This method will be called when a MessageEvent is posted
@@ -101,7 +102,7 @@ public class GoodsInfo extends AppCompatActivity{
         dynamicReceiver = new Receiver();
         registerReceiver(dynamicReceiver,dynamic_filter);
 
-        // - - - - - - - - 注册完毕 - - - - - - - -
+        // - - - - - - - - 动态注册广播 - - - - - - - -
     }
     private void setListener(){
         back.setOnClickListener(new View.OnClickListener() {
@@ -109,7 +110,7 @@ public class GoodsInfo extends AppCompatActivity{
             public void onClick(View view) {
                 Intent intent = new Intent(GoodsInfo.this,MainActivity.class);
                 startActivity(intent);
-                unregisterReceiver(dynamicReceiver);//退出界面后注销广播dynamicReceiver
+
                 finish();
             }
         });//点击返回图标，结束本Activity, resultCode == 1

@@ -25,6 +25,7 @@ public class Receiver extends BroadcastReceiver {
             Bundle bundle = intent.getExtras();
             Goods goods = (Goods) bundle.get("goods");
             int i = (int) bundle.get("Num");
+            i++;
             //
             Bitmap bmp = BitmapFactory.decodeResource(context.getResources(),goods.getPicID());
 
@@ -60,6 +61,8 @@ public class Receiver extends BroadcastReceiver {
                     .setTicker("您有一条新消息")
                     .setLargeIcon(bmp)
                     .setSmallIcon(goods.getPicID())
+                    .setOngoing(true)
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setAutoCancel(true);
 
             Intent intent1 = new Intent(context,GoodsInfo.class);
