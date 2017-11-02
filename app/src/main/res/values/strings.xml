@@ -4,4 +4,6 @@
     <string name="share_contacts">分享商品</string>
     <string name="no_interest">不感兴趣</string>
     <string name="more_info">查看更多商品促销信息</string>
+    <string name="appwidget_text">当前没有任何信息</string>
+    <string name="add_widget">Add widget</string>
 </resources>

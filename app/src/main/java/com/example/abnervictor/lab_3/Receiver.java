@@ -3,12 +3,15 @@ package com.example.abnervictor.lab_3;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.widget.RemoteViews;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -20,6 +23,8 @@ public class Receiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent){
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.m_widget);
 
         if(intent.getAction().equals("Goods_AddtoCart")){
             Bundle bundle = intent.getExtras();
@@ -46,6 +51,17 @@ public class Receiver extends BroadcastReceiver {
 
             Notification notify = builder.build();
             manager.notify(i,notify);
+
+            //widget更新
+            views.setImageViewResource(R.id.widget_pic, goods.getPicID());
+            views.setTextViewText(R.id.widget_text, goods.GetString(1)+"已添加到购物车");
+
+            views.setOnClickPendingIntent(R.id.widget, pendingIntent);//点击事件
+
+            ComponentName componentName = new ComponentName(context, mWidget.class);
+            appWidgetManager.updateAppWidget(componentName, views);
+            //widget更新
+
             EventBus.getDefault().post(new MessageEvent(true,null));
 
         }//接收到添加购物车的广播，该广播动态注册
@@ -75,6 +91,16 @@ public class Receiver extends BroadcastReceiver {
             //绑定Notification，发送通知请求
             Notification notify = builder.build();
             manager.notify(0,notify);
+
+            //widget更新
+            views.setImageViewResource(R.id.widget_pic, goods.getPicID());
+            views.setTextViewText(R.id.widget_text, goods.GetString(1)+"仅售"+goods.GetString(2)+"!");
+
+            views.setOnClickPendingIntent(R.id.widget, pendingIntent);//点击事件
+
+            ComponentName componentName = new ComponentName(context, mWidget.class);
+            appWidgetManager.updateAppWidget(componentName, views);
+            //widget更新
 
             //EventBus.getDefault().post(new MessageEvent(false,true,goods));
 

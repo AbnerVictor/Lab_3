@@ -9,24 +9,31 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".GoodsInfo">
-        </activity>
-
+        <activity android:name=".GoodsInfo"></activity>
 
         <receiver android:name=".Receiver">
             <intent-filter>
-                <action android:name="MyApp_Launched"/>
+                <action android:name="MyApp_Launched" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".mWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
 
-
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/m_widget_info" />
+        </receiver>
     </application>
 
 </manifest>

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         findView();
         InitData();
         setListner();
-        Brocast();
+        Brocast(1);//发送热卖广播
 
         EventBus.getDefault().register(this);//
     }
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Brocast(2);//发送程序销毁的广播
         EventBus.getDefault().unregister(this);
     }
 
@@ -252,16 +253,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void Brocast(){
-        // - - - 发送热卖信息 - - - //
-        Random random = new Random();
-        int randomnum = random.nextInt(10); //产生一个0～(n-1)的随机数
-        Intent intentBroadcast = new Intent("MyApp_Launched");
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("goods", Data.get(randomnum));
-        intentBroadcast.putExtras(bundle);
-        sendBroadcast(intentBroadcast);
-        // - - - end of 发送热卖信息 - - - //
+    private void Brocast(int i){
+        if (i == 1){
+            // - - - 发送热卖信息 - - - //
+            Random random = new Random();
+            int randomnum = random.nextInt(10); //产生一个0～(n-1)的随机数
+            Intent intentBroadcast = new Intent("MyApp_Launched");
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("goods", Data.get(randomnum));
+            intentBroadcast.putExtras(bundle);
+            sendBroadcast(intentBroadcast);
+            // - - - end of 发送热卖信息 - - - //
+        }//程序启动的广播
+        if (i == 2){
+            Intent intentBroadcast = new Intent("MyApp_Destroyed");
+            sendBroadcast(intentBroadcast);
+        }//程序结束的广播
     }
 
 
